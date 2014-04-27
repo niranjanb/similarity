@@ -23,10 +23,7 @@ class WordOverlap extends Similarity{
     def tokens(string:String) = string.split(" ").toSet
     val xtokens = tokens(x)
     val ytokens = tokens(y)
-    dice(xtokens, ytokens)
+    Measures.jaccard(xtokens, ytokens)
   }
-
-  def dice(xtokens: Set[String], ytokens: Set[String]): Double
-    = xtokens.intersect(ytokens).size.toDouble/xtokens.union(ytokens).size
 
 }
