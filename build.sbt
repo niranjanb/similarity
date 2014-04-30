@@ -10,13 +10,10 @@ version := "0.1.0-SNAPSHOT"
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common" % "0.0.1-SNAPSHOT",
   "com.github.scopt" %% "scopt" % "2.1.0",
+  "net.databinder" % "unfiltered-netty-server_2.10" % "0.6.8",
   ariInterface,
-  allenAiCommon,
-   sprayCan,
-   sprayRouting,
-   akkaActor,
-   akkaLogging
-  ) ++ Seq(
+  allenAiCommon
+) ++ Seq(
   "junit" % "junit" % "4.11" % "test",
   "org.mockito" % "mockito-all" % "1.9.5" % "test",
   "com.jsuereth" %% "scala-arm" % "1.3" % "test",
