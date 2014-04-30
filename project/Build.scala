@@ -7,8 +7,11 @@ import spray.revolver.RevolverPlugin._
 
 object SimilarityBuild extends Build {
 
+  Revolver.settings
+
   val allenAiCommon = "org.allenai.common" %% "common" % "0.0.1-SNAPSHOT"
   val ariInterface = "org.allenai.ari" %% "ari-interface" % "2013.4.9-1-SNAPSHOT"
+  //val entailment = "org.allenai.textual-entailment" %% "interface" % "0.0.2-SNAPSHOT"//"2013.03.05-0-SNAPSHOT"
 
   val akkaVersion = "2.3.2"
   def akkaModule(id: String) = "com.typesafe.akka" %% s"akka-$id" % akkaVersion
