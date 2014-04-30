@@ -260,6 +260,7 @@ class Word2Vec {
     vector
   }
 
+
   /** Find N closest terms in the vocab to the given vector, using only words from the in-set (if defined)
     * and excluding all words from the out-set (if non-empty).  Although you can, it doesn't make much
     * sense to define both in and out sets.

@@ -8,8 +8,8 @@ class Word2VecSimilarity(modelFile:String) extends Similarity {
   model.load(modelFile)
 
   override def similarity(x: String, y: String): Double = {
-    val xtokens = x.split(" ").toList
-    val ytokens = y.split(" ").toList
+    val xtokens = x.toLowerCase.split(" ").filter(word => model.contains(word)).toList
+    val ytokens = y.toLowerCase.split(" ").filter(word => model.contains(word)).toList
     val xvector = model.sumVector(xtokens)
     val yvector = model.sumVector(ytokens)
     Measures.cosine(xvector, yvector)
