@@ -25,26 +25,29 @@ trait SimilarityServiceComponent {
   }
 
   trait SimilarityService {
+    //Name of the similarity method.
     def name():String
+
     def similarity(request: SimilarityRequest): Future[SimilarityResult]
   }
 }
 
 trait ProductionSimilarityServiceComponent extends SimilarityServiceComponent { self: ConfigComponent =>
+  //Word2Vec similarity service
   val modelFile = ConfigFactory.load().getString("word2vec.modelFile")
   val word2Vec = new Word2VecSimilarity(modelFile) with SimilarityService {
-    override def name(): String = "Word2Vec"
-    override def similarity(request: SimilarityRequest): Future[SimilarityResult] = {
+    def similarity(request: SimilarityRequest): Future[SimilarityResult] = {
       val confidence = similarity(request.text, request.hypothesis)
       Future.successful(SimilarityResult(request, name, confidence))
     }
   }
+  //Bag-of-words similarity service.
   val bow = new WordOverlap() with SimilarityService {
-    override def name(): String = "BOW-DICE"
     override def similarity(request: SimilarityRequest): Future[SimilarityResult] = {
       val confidence = similarity(request.text, request.hypothesis)
       Future.successful(SimilarityResult(request, name, confidence))
     }
   }
+  //Add to similarity services.
   override protected val similarityServices = Seq(word2Vec, bow)
 }
