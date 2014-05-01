@@ -1,39 +1,21 @@
-import Dependencies._
+import com.typesafe.sbt.web.SbtWeb
 
-// To add UI library dependencies, prefer to use WebJars instead of a CDN.
-// Find webjars here: http://www.webjars.org/
+name := "similarity"
 
-libraryDependencies ++= Seq(
-  "org.webjars" % "angularjs" % "1.2.16",
-  "org.webjars" % "requirejs" % "2.1.11-1",
-  "org.webjars" % "angular-ui-router" % "0.2.10",
-  "org.webjars" % "bootstrap" % "3.1.1",
-  akkaModule("actor"),
-  sprayModule("routing")
-)
+organization := "org.allenai"
 
-// Helper for traversing a directory and returning a flat sequence of files
-def filesOnly(source: File): Seq[File] =
-  if (!source.isDirectory) source :: Nil
-  else Option(source.listFiles) match {
-    case None        => Nil
-    case Some(files) => files flatMap filesOnly
-  }
+scalaVersion := "2.10.4"
 
-// Helper for copying one directory into another
-def copyFiles(baseDirectory: File, newBase: File): Seq[File] = {
-  if (!baseDirectory.exists) baseDirectory.mkdirs()
-  if (!newBase.exists) newBase.mkdirs()
-  val sourceFiles = filesOnly(baseDirectory)
-  val mappings = sourceFiles pair rebase(Seq(baseDirectory), newBase)
-  IO.copy(mappings, true).toSeq
-}
+// `core` contains models and services for running the application.
+val core = project in file("core")
 
-compile in Compile <<= (compile in Compile).dependsOn(WebKeys.assets in Assets)
+// `webclient` project does not have any dependencies on other
+// projects. It is simply meant for building an AngularJS web
+// application which can be served up by the webserver.
+val webclient = (project in file("webclient")).addPlugins(SbtWeb)
 
-resourceGenerators in Compile <+= Def.task {
-  val assets = (WebKeys.assets in Assets).value
-  val assetsTarget = (WebKeys.webTarget in Assets).value
-  val newBase = (resourceManaged in Compile).value / "web"
-  copyFiles(assetsTarget, newBase)
-}
+// `webserver` has two roles: serving up the `webclient`'s assets, and
+// serving up a JSON API for our `core`'s services.
+val webserver = (project in file("webserver")).dependsOn(core, webclient)
+
+val root = (project in file(".")).aggregate(core, webclient, webserver)
