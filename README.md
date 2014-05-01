@@ -8,3 +8,9 @@ If you need to add a similarity service:
 
 2. Add your service to org.allenai.similarity.services.ProductionSimilarityServiceComponent following the BOW example.
 
+To run webapp:
+
+1. sbt
+
+2. webserver/reStart
+
