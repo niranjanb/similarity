@@ -1,44 +1,21 @@
-import com.typesafe.sbt.SbtNativePackager.packageArchetype
+import com.typesafe.sbt.web.SbtWeb
 
-name := "simialrity"
+name := "similarity"
 
-description := "Similarity measures"
+organization := "org.allenai"
 
-version := "0.1.0-SNAPSHOT"
+scalaVersion := "2.10.4"
 
+// `core` contains models and services for running the application.
+val core = project in file("core")
 
-libraryDependencies ++= Seq(
-  "com.github.scopt" %% "scopt" % "2.1.0",
-  "net.databinder" % "unfiltered-netty-server_2.10" % "0.6.8",
-  allenAiCommon
-) ++ Seq(
-  "junit" % "junit" % "4.11" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5" % "test",
-  "com.jsuereth" %% "scala-arm" % "1.3" % "test",
-  "org.scalacheck" % "scalacheck_2.10" % "1.10.1" % "test",
-  "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
-)
+// `webclient` project does not have any dependencies on other
+// projects. It is simply meant for building an AngularJS web
+// application which can be served up by the webserver.
+val webclient = (project in file("webclient")).addPlugins(SbtWeb)
 
-scalacOptions in ThisBuild ++= Seq("-feature", "-deprecation", "-Xlint")
+// `webserver` has two roles: serving up the `webclient`'s assets, and
+// serving up a JSON API for our `core`'s services.
+val webserver = (project in file("webserver")).dependsOn(core, webclient)
 
-scalaVersion := "2.10.3"
-
-Publish.settings ++ Format.settings ++ TravisPublisher.settings
-
-resolvers ++= Seq(
-  "spray" at "http://repo.spray.io",
-  "AllenAI Releases" at "http://utility.allenai.org:8081/nexus/content/repositories/releases",
-  "AllenAI Snapshots" at "http://utility.allenai.org:8081/nexus/content/repositories/snapshots"
-)
-
-// SBT native packager configs.
-packageArchetype.java_application
-
-// Map conf => conf, src/main/scripts => bin
-// See http://www.scala-sbt.org/0.12.3/docs/Detailed-Topics/Mapping-Files.html
-// for more info on sbt mappings.
-// this is insane
-mappings in Universal ++=
-  (sourceDirectory.value / "main" / "scripts" ** "*" x rebase(sourceDirectory.value / "main" / "scripts", "bin/")) ++
-  (baseDirectory.value / "conf" ** "*" x rebase(baseDirectory.value / "conf", "conf/"))
-
+val root = (project in file(".")).aggregate(core, webclient, webserver)
